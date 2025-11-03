@@ -328,6 +328,25 @@ namespace Epam.ItMarathon.ApiService.Domain.Aggregate.Room
             return ValidateProperty(char.ToLowerInvariant(propertyName[0]) + propertyName[1..]);
         }
 
+        //added by me
+        public Result<Room, ValidationResult> DeleteUser(ulong? userid)
+        {
+            var roomCanBeModifiedResult = CheckRoomCanBeModified();
+            if (roomCanBeModifiedResult.IsFailure)
+            {
+                return Result.Failure<Room, ValidationResult>(roomCanBeModifiedResult.Error);
+            }
+            var userToDelete = Users.FirstOrDefault(user => user.Id == userid);
+            if (userToDelete is null)
+            {
+                return Result.Failure<Room, ValidationResult>(new NotFoundError([
+                    new ValidationFailure("user.Id", "User with the specified Id was not found in the room.")
+                ]));
+            }
+            Users.Remove(userToDelete);
+            return this;
+        }
+        //end added by me
         private Result<Room, ValidationResult> ValidateProperty(string propertyName)
         {
             var validationResult = new RoomValidator().Validate(this,
