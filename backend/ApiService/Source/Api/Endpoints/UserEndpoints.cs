@@ -62,6 +62,17 @@ namespace Epam.ItMarathon.ApiService.Api.Endpoints
                 })
                 .WithSummary("Create and add user to a room.")
                 .WithDescription("Return created user info.");
+            //added by me
+            _ = root.MapDelete("{id:long}", DeleteUserWithId)
+                .AddEndpointFilterFactory(ValidationFactoryFilter.GetValidationFactory)
+                .Produces(StatusCodes.Status200OK)
+                .ProducesProblem(StatusCodes.Status400BadRequest)
+                .ProducesProblem(StatusCodes.Status401Unauthorized)
+                .ProducesProblem(StatusCodes.Status404NotFound)
+                .ProducesProblem(StatusCodes.Status500InternalServerError)
+                .WithSummary("Delete user by user Id.")
+                .WithDescription("Ok if user deleted.");
+
 
             return application;
         }
@@ -129,5 +140,19 @@ namespace Epam.ItMarathon.ApiService.Api.Endpoints
                 ? result.Error.ValidationProblem()
                 : Results.Created(string.Empty, mapper.Map<UserCreationResponse>(result.Value));
         }
+
+        //added by me    
+        public static async Task<IResult> DeleteUserWithId([FromRoute] ulong id, [FromQuery, Required] string? userCode,
+            IMediator mediator, IMapper mapper, CancellationToken cancellationToken)
+        {
+            var result = await mediator.Send(new DeleteUserRequest(userCode!, id), cancellationToken);
+            if (result.IsFailure)
+            {
+                return result.Error.ValidationProblem();
+            }
+            return Results.Ok();
+        }
+        //end added by me
+
     }
 }
