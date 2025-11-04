@@ -6,10 +6,8 @@ using FluentValidation.Results;
 using MediatR;
 using RoomAggeregate = Epam.ItMarathon.ApiService.Domain.Aggregate.Room.Room;
 
-
 namespace Epam.ItMarathon.ApiService.Application.UseCases.User.Handlers
-{
-   
+{ 
     public class DeleteUserHandler(IRoomRepository roomRepository) :
         IRequestHandler<DeleteUserRequest, Result<RoomAggeregate, ValidationResult>>
     {
@@ -25,12 +23,13 @@ namespace Epam.ItMarathon.ApiService.Application.UseCases.User.Handlers
             }
 
             var room = roomResult.Value;
-            var deleteResult = room.DeleteUser(request.UserId);
-            if (deleteResult.IsFailure)
+
+            var result = room.DeleteUser(request.UserCode, request.UserId);
+            if (result.IsFailure)
             {
-                return deleteResult.ConvertFailure<RoomAggeregate>();
+                return result.ConvertFailure<RoomAggeregate>();
             }
-    
+
             var updateResult = await roomRepository.UpdateAsync(room, cancellationToken);
             if (updateResult.IsFailure)
             {
