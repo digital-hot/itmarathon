@@ -58,6 +58,8 @@ export class ParticipantCard {
   public readonly ariaLabelCopy = AriaLabel.ParticipantLink;
   public readonly iconInfo = IconName.Info;
   public readonly ariaLabelInfo = AriaLabel.Info;
+  public readonly iconDelete = IconName.Delete;
+  public readonly ariaLabelDelete = AriaLabel.Delete;
 
   @HostBinding('tabindex') tab = 0;
   @HostBinding('class.list-row') rowClass = true;
@@ -120,6 +122,14 @@ export class ParticipantCard {
       this.#popup.hide(target);
     }
   }
+
+  public onDeleteClick(): void {
+    const userId = this.participant().id;
+    const code = this.userCode();
+    console.log('Видалення користувача...');
+    this.#userService.deleteUser(userId).subscribe();
+  }
+
 
   #openModal(): void {
     const personalInfo = getPersonalInfo(this.participant());
