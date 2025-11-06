@@ -328,6 +328,50 @@ namespace Epam.ItMarathon.ApiService.Domain.Aggregate.Room
             return ValidateProperty(char.ToLowerInvariant(propertyName[0]) + propertyName[1..]);
         }
 
+        //added by me
+        public Result<Room, ValidationResult> DeleteUser(string userCode, ulong? userid)
+        {
+            
+            var roomCanBeModifiedResult = CheckRoomCanBeModified();
+            if (roomCanBeModifiedResult.IsFailure)
+            {
+                return Result.Failure<Room, ValidationResult>(roomCanBeModifiedResult.Error);
+            }
+
+            var admin = Users.FirstOrDefault(user => user.AuthCode == userCode);
+            if (admin is null)
+            {
+                return Result.Failure<Room, ValidationResult>(new NotFoundError([
+                    new ValidationFailure("userCode", "User not found.")
+                ]));
+            }
+          
+            if (!admin.IsAdmin)
+            {
+                return Result.Failure<Room, ValidationResult>(new ForbiddenError([
+                    new ValidationFailure("userCode", "Only admin can delete users.")
+                ]));
+            }
+
+            var userToDelete = Users.FirstOrDefault(user => user.Id == userid);
+            if (userToDelete is null)
+            {
+                return Result.Failure<Room, ValidationResult>(new NotFoundError([
+                    new ValidationFailure("user.Id", "User with the specified Id was not found in the room.")
+                ]));
+            }
+
+            if (admin.Id == userToDelete.Id)
+            {
+                return Result.Failure<Room, ValidationResult>(new ForbiddenError([
+                    new ValidationFailure("userId", "Admin cannot delete themselves.")
+                ]));
+            }
+
+            Users.Remove(userToDelete);
+            return this;
+        }
+        //end added by me
         private Result<Room, ValidationResult> ValidateProperty(string propertyName)
         {
             var validationResult = new RoomValidator().Validate(this,
