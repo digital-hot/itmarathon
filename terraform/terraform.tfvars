@@ -83,4 +83,4 @@ db_subnet_group_name = "rds-private-subnet-group"
 ################################################################################
 
 domain_name = "urfine.pp.ua"
-certificate_arn = "arn:aws:acm:eu-central-1:978652145382:certificate/c7c11636-12b2-4fad-a119-2607c87d86e4"
+certificate_arn = "arn:aws:acm:eu-central-1:406374951272:certificate/8a12a462-6d3d-4d14-b71d-5fcd9762c3fa"
